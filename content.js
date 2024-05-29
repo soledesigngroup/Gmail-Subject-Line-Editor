@@ -7,28 +7,29 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to load stored subject lines
     function loadStoredSubjects() {
       chrome.storage.local.get(null, function(items) {
-        const emails = document.querySelectorAll('.zA .bog'); // Adjust the selector to target email subject lines
-        emails.forEach(email => {
-          const emailId = getEmailId(email);
+        const emailSubject = document.querySelector('.hP'); // Adjust the selector to target the email subject line in the email view
+        if (emailSubject) {
+          const emailId = emailSubject.textContent.trim(); // Use the subject text as a key, you might need to find a better unique identifier
           if (items[emailId] && items[emailId].editedSubject) {
-            email.textContent = items[emailId].editedSubject;
+            emailSubject.textContent = items[emailId].editedSubject;
           }
-        });
+        }
       });
     }
   
     // Load stored subject lines when the page loads
     loadStoredSubjects();
   
-    const emails = document.querySelectorAll('.zA .bog'); // Adjust the selector to target email subject lines
+    // Select the subject line in the email view
+    const emailSubject = document.querySelector('.hP'); // Adjust the selector to target the email subject line in the email view
   
-    emails.forEach(email => {
-      email.addEventListener('dblclick', function() {
-        const originalSubject = email.textContent;
+    if (emailSubject) {
+      emailSubject.addEventListener('dblclick', function() {
+        const originalSubject = emailSubject.textContent;
         const newSubject = prompt('Enter new subject line:', originalSubject);
         if (newSubject) {
-          email.textContent = newSubject;
-          const emailId = getEmailId(email);
+          emailSubject.textContent = newSubject;
+          const emailId = originalSubject.trim(); // Use the subject text as a key, you might need to find a better unique identifier
           let storageItem = {};
           storageItem[emailId] = { originalSubject: originalSubject, editedSubject: newSubject };
           chrome.storage.local.set(storageItem, function() {
@@ -36,5 +37,5 @@ document.addEventListener('DOMContentLoaded', function() {
           });
         }
       });
-    });
+    }
   });
