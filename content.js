@@ -1,18 +1,19 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Function to get email ID from the email element
-    function getEmailId(emailElement) {
-      return emailElement.closest('.zA').dataset.messageId;
-    }
+    console.log('DOMContentLoaded event fired');
   
     // Function to load stored subject lines
     function loadStoredSubjects() {
       chrome.storage.local.get(null, function(items) {
-        const emailSubject = document.querySelector('.hP'); // Adjust the selector to target the email subject line in the email view
+        const emailSubject = document.querySelector('.hP'); // Selector for the email subject line in the email view
         if (emailSubject) {
-          const emailId = emailSubject.textContent.trim(); // Use the subject text as a key, you might need to find a better unique identifier
+          console.log('Subject line element found');
+          const emailId = emailSubject.dataset.threadPermId; // Use the thread-perm-id as a key
+          console.log('Email ID:', emailId);
           if (items[emailId] && items[emailId].editedSubject) {
             emailSubject.textContent = items[emailId].editedSubject;
           }
+        } else {
+          console.log('Subject line element not found');
         }
       });
     }
@@ -21,15 +22,17 @@ document.addEventListener('DOMContentLoaded', function() {
     loadStoredSubjects();
   
     // Select the subject line in the email view
-    const emailSubject = document.querySelector('.hP'); // Adjust the selector to target the email subject line in the email view
+    const emailSubject = document.querySelector('.hP'); // Selector for the email subject line in the email view
   
     if (emailSubject) {
+      console.log('Adding double-click event listener');
       emailSubject.addEventListener('dblclick', function() {
+        console.log('Subject line double-clicked');
         const originalSubject = emailSubject.textContent;
         const newSubject = prompt('Enter new subject line:', originalSubject);
         if (newSubject) {
           emailSubject.textContent = newSubject;
-          const emailId = originalSubject.trim(); // Use the subject text as a key, you might need to find a better unique identifier
+          const emailId = emailSubject.dataset.threadPermId; // Use the thread-perm-id as a key
           let storageItem = {};
           storageItem[emailId] = { originalSubject: originalSubject, editedSubject: newSubject };
           chrome.storage.local.set(storageItem, function() {
@@ -37,5 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
           });
         }
       });
+    } else {
+      console.log('Subject line element not found');
     }
   });
